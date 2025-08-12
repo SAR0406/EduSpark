@@ -21,7 +21,7 @@ const QuizQuestionSchema = z.object({
 /**
  * Zod schema for the input to the Quiz Generator flow.
  */
-export const GenerateQuizInputSchema = z.object({
+const GenerateQuizInputSchema = z.object({
   topic: z.string().describe('The topic for the quiz.'),
   contextText: z.string().optional().describe('Optional source text to base the quiz on.'),
   numQuestions: z.number().int().min(1).max(10).describe('The number of questions to generate.'),
@@ -31,7 +31,7 @@ export type GenerateQuizInput = z.infer<typeof GenerateQuizInputSchema>;
 /**
  * Zod schema for the output of the Quiz Generator flow.
  */
-export const GenerateQuizOutputSchema = z.object({
+const GenerateQuizOutputSchema = z.object({
   quizTitle: z.string().describe('A title for the generated quiz.'),
   questions: z.array(QuizQuestionSchema).describe('An array of quiz questions.'),
 });

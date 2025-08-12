@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Essay Generator flow.
  */
-export const GenerateEssayInputSchema = z.object({
+const GenerateEssayInputSchema = z.object({
   topic: z.string().describe('The topic or prompt for the essay.'),
   essayLength: z.enum(['short', 'medium', 'long']).optional().describe('The desired length of the essay.'),
   style: z.enum(['academic', 'persuasive', 'narrative', 'descriptive', 'expository']).optional().describe('The desired writing style.'),
@@ -21,7 +21,7 @@ export type GenerateEssayInput = z.infer<typeof GenerateEssayInputSchema>;
 /**
  * Zod schema for the output of the Essay Generator flow.
  */
-export const GenerateEssayOutputSchema = z.object({
+const GenerateEssayOutputSchema = z.object({
   titleSuggestion: z.string().describe('A creative title suggestion for the essay.'),
   essay: z.string().describe('The full text of the generated essay.'),
 });

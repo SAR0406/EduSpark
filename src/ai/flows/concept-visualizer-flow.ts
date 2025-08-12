@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Concept Visualizer flow.
  */
-export const VisualizeConceptInputSchema = z.object({
+const VisualizeConceptInputSchema = z.object({
   conceptDescription: z.string().describe('A description of the concept to be visualized.'),
 });
 export type VisualizeConceptInput = z.infer<typeof VisualizeConceptInputSchema>;
@@ -19,7 +19,7 @@ export type VisualizeConceptInput = z.infer<typeof VisualizeConceptInputSchema>;
 /**
  * Zod schema for the output of the Concept Visualizer flow.
  */
-export const VisualizeConceptOutputSchema = z.object({
+const VisualizeConceptOutputSchema = z.object({
   imageDataUri: z.string().describe("The generated image as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
   textFeedback: z.string().describe('A short text response to accompany the image.'),
 });
@@ -50,6 +50,7 @@ export async function visualizeConcept(input: VisualizeConceptInput): Promise<Vi
       };
   } catch (error) {
       console.error("Concept visualizer error:", error);
+      // Return a user-friendly error response with a placeholder
       return {
           imageDataUri: `https://placehold.co/1024x576.png`,
           textFeedback: "AI image generation is currently unavailable. Here is a placeholder image."

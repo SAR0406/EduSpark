@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Summarizer flow.
  */
-export const SummarizeTextInputSchema = z.object({
+const SummarizeTextInputSchema = z.object({
   chapterName: z.string().optional().describe('The optional name of the chapter or document being summarized.'),
   textToSummarize: z.string().describe('The source text to be summarized.'),
   summaryLength: z.enum(['short', 'medium', 'long']).optional().describe('The desired length of the summary.'),
@@ -21,7 +21,7 @@ export type SummarizeTextInput = z.infer<typeof SummarizeTextInputSchema>;
 /**
  * Zod schema for the output of the Summarizer flow.
  */
-export const SummarizeTextOutputSchema = z.object({
+const SummarizeTextOutputSchema = z.object({
   summary: z.string().describe('The generated summary text.'),
 });
 export type SummarizeTextOutput = z.infer<typeof SummarizeTextOutputSchema>;

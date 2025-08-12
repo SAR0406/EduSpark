@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Personalized Study Plan flow.
  */
-export const PersonalizedStudyPlanInputSchema = z.object({
+const PersonalizedStudyPlanInputSchema = z.object({
   studentPerformance: z.string().describe("A summary of the student's past performance, strengths, and weaknesses."),
   learningGoals: z.string().describe('The specific academic goals the student wants to achieve.'),
   availableMaterials: z.string().describe('A list of learning materials available to the student (e.g., textbooks, online resources).'),
@@ -21,7 +21,7 @@ export type PersonalizedStudyPlanInput = z.infer<typeof PersonalizedStudyPlanInp
 /**
  * Zod schema for the output of the Personalized Study Plan flow.
  */
-export const PersonalizedStudyPlanOutputSchema = z.object({
+const PersonalizedStudyPlanOutputSchema = z.object({
   studyPlan: z.string().describe('A well-formatted, actionable study plan text.'),
 });
 export type PersonalizedStudyPlanOutput = z.infer<typeof PersonalizedStudyPlanOutputSchema>;

@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Homework Helper flow.
  */
-export const HomeworkHelperInputSchema = z.object({
+const HomeworkHelperInputSchema = z.object({
   problemStatement: z.string().describe('The math problem to be solved.'),
 });
 export type HomeworkHelperInput = z.infer<typeof HomeworkHelperInputSchema>;
@@ -19,7 +19,7 @@ export type HomeworkHelperInput = z.infer<typeof HomeworkHelperInputSchema>;
 /**
  * Zod schema for the output of the Homework Helper flow.
  */
-export const HomeworkHelperOutputSchema = z.object({
+const HomeworkHelperOutputSchema = z.object({
   problemType: z.string().describe('The type of math problem (e.g., Algebra, Calculus).'),
   stepByStepSolution: z.string().describe('A detailed, step-by-step explanation of the solution.'),
   finalAnswer: z.string().describe('The final, clear answer to the problem.'),

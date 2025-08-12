@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Debate Topic Suggester flow.
  */
-export const SuggestDebateTopicsInputSchema = z.object({
+const SuggestDebateTopicsInputSchema = z.object({
   subjectArea: z.string().describe('The subject area for which to generate debate topics.'),
   numTopics: z.number().int().min(2).max(7).describe('The number of debate topics to generate.'),
 });
@@ -20,7 +20,7 @@ export type SuggestDebateTopicsInput = z.infer<typeof SuggestDebateTopicsInputSc
 /**
  * Zod schema for the output of the Debate Topic Suggester flow.
  */
-export const SuggestDebateTopicsOutputSchema = z.object({
+const SuggestDebateTopicsOutputSchema = z.object({
   suggestedTitle: z.string().describe('A creative title for the set of debate topics.'),
   topics: z.array(z.string()).describe('A list of the generated debate topics.'),
 });

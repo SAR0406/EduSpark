@@ -30,7 +30,7 @@ const VerifiedQuestionResultSchema = z.object({
 /**
  * Zod schema for the input to the Verify Quiz Answers flow.
  */
-export const VerifyQuizAnswersInputSchema = z.object({
+const VerifyQuizAnswersInputSchema = z.object({
   questionsAndUserAnswers: z.array(QuestionAndAnswerSchema),
 });
 export type VerifyQuizAnswersInput = z.infer<typeof VerifyQuizAnswersInputSchema>;
@@ -38,7 +38,7 @@ export type VerifyQuizAnswersInput = z.infer<typeof VerifyQuizAnswersInputSchema
 /**
  * Zod schema for the output of the Verify Quiz Answers flow.
  */
-export const VerifyQuizAnswersOutputSchema = z.object({
+const VerifyQuizAnswersOutputSchema = z.object({
   verifiedResults: z.array(VerifiedQuestionResultSchema),
 });
 export type VerifyQuizAnswersOutput = z.infer<typeof VerifyQuizAnswersOutputSchema>;

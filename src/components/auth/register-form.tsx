@@ -9,6 +9,7 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -64,15 +65,23 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterFormValues) {
     setIsLoading(true);
     try {
+      // 1. Create the user
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      
+      // 2. Update their profile with the full name
       await updateProfile(userCredential.user, { displayName: values.fullName });
+      
+      // 3. Save user data to Firestore
       await saveUserToFirestore(userCredential.user, values.fullName);
       
+      // 4. Automatically sign the user in
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+
       toast({
         title: "Account Created!",
-        description: "Welcome to EduSpark. Please log in.",
+        description: "Welcome to EduSpark! Redirecting you to the dashboard...",
       });
-      router.push("/login");
+      router.push("/dashboard");
 
     } catch (error: any) {
       let description = "An unexpected error occurred.";

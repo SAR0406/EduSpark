@@ -19,7 +19,7 @@ const FlashcardSchema = z.object({
 /**
  * Zod schema for the input to the Flashcard Generator flow.
  */
-export const GenerateFlashcardsInputSchema = z.object({
+const GenerateFlashcardsInputSchema = z.object({
   sourceText: z.string().describe('The source text from which to generate flashcards.'),
   numFlashcards: z.number().int().min(3).max(20).describe('The number of flashcards to generate.'),
 });
@@ -28,7 +28,7 @@ export type GenerateFlashcardsInput = z.infer<typeof GenerateFlashcardsInputSche
 /**
  * Zod schema for the output of the Flashcard Generator flow.
  */
-export const GenerateFlashcardsOutputSchema = z.object({
+const GenerateFlashcardsOutputSchema = z.object({
   suggestedTitle: z.string().describe('A suggested title for the flashcard set.'),
   flashcards: z.array(FlashcardSchema).describe('An array of generated flashcards.'),
 });

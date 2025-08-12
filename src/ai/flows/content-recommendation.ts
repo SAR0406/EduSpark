@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Content Recommendation flow.
  */
-export const RecommendContentInputSchema = z.object({
+const RecommendContentInputSchema = z.object({
   learningHistory: z.string().describe("A summary of the user's past learning activities and performance."),
   preferences: z.string().describe("A summary of the user's interests and learning style preferences."),
 });
@@ -20,7 +20,7 @@ export type RecommendContentInput = z.infer<typeof RecommendContentInputSchema>;
 /**
  * Zod schema for the output of the Content Recommendation flow.
  */
-export const RecommendContentOutputSchema = z.object({
+const RecommendContentOutputSchema = z.object({
   recommendedMaterials: z.string().describe('A formatted text string containing 3-5 specific topics, concepts, or subjects to explore next.'),
 });
 export type RecommendContentOutput = z.infer<typeof RecommendContentOutputSchema>;

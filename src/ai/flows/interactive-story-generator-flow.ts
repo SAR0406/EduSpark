@@ -11,7 +11,7 @@ import {z} from 'zod';
 /**
  * Zod schema for the input to the Interactive Story Generator flow.
  */
-export const GenerateStoryInputSchema = z.object({
+const GenerateStoryInputSchema = z.object({
   mainCharacter: z.string().describe('The name of the main character.'),
   setting: z.string().describe('The setting or world where the story takes place.'),
   genre: z.enum(['fantasy', 'sci-fi', 'mystery', 'adventure', 'comedy', 'drama']).describe('The genre of the story.'),
@@ -22,7 +22,7 @@ export type GenerateStoryInput = z.infer<typeof GenerateStoryInputSchema>;
 /**
  * Zod schema for the output of the Interactive Story Generator flow.
  */
-export const GenerateStoryOutputSchema = z.object({
+const GenerateStoryOutputSchema = z.object({
   title: z.string().describe('A creative title for the generated story.'),
   storyText: z.string().describe('The full text of the generated story.'),
 });

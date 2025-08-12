@@ -32,7 +32,7 @@ const SectionSchema = z.object({
 /**
  * Zod schema for the input to the Question Paper Generator flow.
  */
-export const QuestionPaperInputSchema = z.object({
+const QuestionPaperInputSchema = z.object({
   className: z.string().describe('The class or grade level.'),
   subject: z.string().describe('The academic subject.'),
   examType: z.string().describe('The type of exam (e.g., "Unit Test", "Final Exam").'),
@@ -46,7 +46,7 @@ export type QuestionPaperInput = z.infer<typeof QuestionPaperInputSchema>;
 /**
  * Zod schema for the output of the Question Paper Generator flow.
  */
-export const QuestionPaperOutputSchema = z.object({
+const QuestionPaperOutputSchema = z.object({
   title: z.string().describe('The title of the question paper.'),
   totalMarks: z.number().int().describe('The total marks for the paper.'),
   duration: z.string().describe('The duration of the exam.'),

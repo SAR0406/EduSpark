@@ -1,9 +1,9 @@
 
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-const firebaseConfig = {
+const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -13,13 +13,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Enhanced debugging logs for setup verification
-if (typeof window !== 'undefined') {
-  console.log("Firebase Lib: Attempting to initialize Firebase on client...");
-  if (!firebaseConfig.apiKey) {
-    console.error("CRITICAL ERROR (Firebase Lib): NEXT_PUBLIC_FIREBASE_API_KEY is missing. Ensure it's in your .env.local file and the Next.js server was restarted.");
-  }
+// Robust check for essential Firebase config keys
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+    throw new Error("CRITICAL ERROR: Firebase API Key or Project ID is missing from environment variables. Ensure NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_PROJECT_ID are set in your .env.local file and the Next.js server was restarted.");
 }
+
 
 // Initialize Firebase
 let app;
@@ -30,7 +28,7 @@ if (!getApps().length) {
     console.error("Firebase initialization failed:", e);
     // In a real app, you might want to show a more user-friendly error
     // or disable Firebase-dependent features.
-    throw new Error("Could not initialize Firebase. Please check your configuration.");
+    throw new Error("Could not initialize Firebase. Please check your configuration in the Firebase console.");
   }
 } else {
   app = getApp();
