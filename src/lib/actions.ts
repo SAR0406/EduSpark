@@ -78,7 +78,7 @@ import {
 } from '@/ai/flows/verify-quiz-answers-flow';
 
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 
 // Re-exporting types for client components to use
 export type { ChapterMaterialOutput, MCQ } from '@/ai/flows/chapter-material-generator';
@@ -105,48 +105,57 @@ interface ActionResult<T> {
 async function handleFlow<TInput, TOutput>(
   flow: (input: TInput) => Promise<TOutput>,
   input: TInput,
-  errorMessage: string
+  flowName: string
 ): Promise<ActionResult<TOutput>> {
   try {
     const data = await flow(input);
     return { success: true, data };
   } catch (error) {
-    const e = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error(`${errorMessage}:`, e);
-    return { success: false, error: `${errorMessage}: ${e}` };
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error(`Error in ${flowName}:`, errorMessage);
+    return { success: false, error: `Failed to execute ${flowName.replace(/([A-Z])/g, ' $1').toLowerCase()}: ${errorMessage}` };
   }
 }
 
 // AI Action Implementations
-export const handleAskQuestion = async (input: AskQuestionInput) => handleFlow(askQuestion, input, "AI Tutor failed");
-export const handleGenerateChapterMaterial = async (input: ChapterMaterialInput) => handleFlow(generateChapterMaterial, input, "Failed to generate chapter material");
-export const handleGenerateCode = async (input: GenerateCodeInput) => handleFlow(generateCode, input, "Failed to generate code");
-export const handleVisualizeConcept = async (input: VisualizeConceptInput) => handleFlow(visualizeConcept, input, "Failed to visualize concept");
-export const handleRecommendContent = async (input: RecommendContentInput) => handleFlow(recommendContent, input, "Failed to get recommendations");
-export const handleSuggestDebateTopics = async (input: SuggestDebateTopicsInput) => handleFlow(suggestDebateTopics, input, "Failed to suggest debate topics");
-export const handleGenerateEssay = async (input: GenerateEssayInput) => handleFlow(generateEssay, input, "Failed to generate essay");
-export const handleGenerateFlashcards = async (input: GenerateFlashcardsInput) => handleFlow(generateFlashcards, input, "Failed to generate flashcards");
-export const handleSolveMathProblem = async (input: HomeworkHelperInput) => handleFlow(solveMathProblem, input, "Failed to solve math problem");
-export const handleGenerateInteractiveStory = async (input: GenerateStoryInput) => handleFlow(generateInteractiveStory, input, "Failed to generate story");
-export const handleGenerateStudyPlan = async (input: PersonalizedStudyPlanInput) => handleFlow(generateStudyPlan, input, "Failed to generate study plan");
-export const handleGenerateQuestionPaper = async (input: QuestionPaperInput) => handleFlow(generateQuestionPaper, input, "Failed to generate question paper");
-export const handleGenerateQuiz = async (input: GenerateQuizInput) => handleFlow(generateQuiz, input, "Failed to generate quiz");
-export const handleSummarizeText = async (input: SummarizeTextInput) => handleFlow(summarizeText, input, "Failed to summarize text");
-export const handleVerifyQuizAnswers = async (input: VerifyQuizAnswersInput) => handleFlow(verifyQuizAnswers, input, "Failed to verify quiz answers");
+export const handleAskQuestion = async (input: AskQuestionInput) => handleFlow(askQuestion, input, "askQuestion");
+export const handleGenerateChapterMaterial = async (input: ChapterMaterialInput) => handleFlow(generateChapterMaterial, input, "generateChapterMaterial");
+export const handleGenerateCode = async (input: GenerateCodeInput) => handleFlow(generateCode, input, "generateCode");
+export const handleVisualizeConcept = async (input: VisualizeConceptInput) => handleFlow(visualizeConcept, input, "visualizeConcept");
+export const handleRecommendContent = async (input: RecommendContentInput) => handleFlow(recommendContent, input, "recommendContent");
+export const handleSuggestDebateTopics = async (input: SuggestDebateTopicsInput) => handleFlow(suggestDebateTopics, input, "suggestDebateTopics");
+export const handleGenerateEssay = async (input: GenerateEssayInput) => handleFlow(generateEssay, input, "generateEssay");
+export const handleGenerateFlashcards = async (input: GenerateFlashcardsInput) => handleFlow(generateFlashcards, input, "generateFlashcards");
+export const handleSolveMathProblem = async (input: HomeworkHelperInput) => handleFlow(solveMathProblem, input, "solveMathProblem");
+export const handleGenerateInteractiveStory = async (input: GenerateStoryInput) => handleFlow(generateInteractiveStory, input, "generateInteractiveStory");
+export const handleGenerateStudyPlan = async (input: PersonalizedStudyPlanInput) => handleFlow(generateStudyPlan, input, "generateStudyPlan");
+export const handleGenerateQuestionPaper = async (input: QuestionPaperInput) => handleFlow(generateQuestionPaper, input, "generateQuestionPaper");
+export const handleGenerateQuiz = async (input: GenerateQuizInput) => handleFlow(generateQuiz, input, "generateQuiz");
+export const handleSummarizeText = async (input: SummarizeTextInput) => handleFlow(summarizeText, input, "summarizeText");
+export const handleVerifyQuizAnswers = async (input: VerifyQuizAnswersInput) => handleFlow(verifyQuizAnswers, input, "verifyQuizAnswers");
 
-// Non-AI action
+/**
+ * Logs a study activity to the user's subcollection in Firestore.
+ * @param {string} userId - The UID of the user.
+ * @param {{ title: string, subject: string }} activity - The activity details.
+ * @returns {Promise<ActionResult<null>>} The result of the action.
+ */
 export async function logStudyActivity(userId: string, activity: { title: string, subject: string }): Promise<ActionResult<null>> {
     if (!userId) {
-        return { success: false, error: "User is not authenticated." };
+        return { success: false, error: "User is not authenticated. Cannot log activity." };
     }
     try {
-        await addDoc(collection(db, 'users', userId, 'studyActivities'), {
+        const userActivitiesRef = collection(db, 'users', userId, 'studyActivities');
+        const docRef = doc(userActivitiesRef); // Create a new document reference with an auto-generated ID
+        await addDoc(userActivitiesRef, {
+            id: docRef.id, // Store the auto-generated ID within the document
             ...activity,
             timestamp: serverTimestamp()
         });
-        return { success: true };
+        return { success: true, data: null };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        console.error('Failed to log study activity:', errorMessage);
         return { success: false, error: `Failed to log activity: ${errorMessage}` };
     }
 }

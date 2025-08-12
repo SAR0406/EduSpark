@@ -5,10 +5,8 @@
  * This flow creates a structured exam paper based on specified parameters.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for a single question within a question paper.
@@ -57,7 +55,7 @@ export const QuestionPaperOutputSchema = z.object({
 });
 export type QuestionPaperOutput = z.infer<typeof QuestionPaperOutputSchema>;
 
-const prompt = ai.definePrompt({
+const generateQuestionPaperPrompt = ai.definePrompt({
     name: 'generateQuestionPaperPrompt',
     input: { schema: QuestionPaperInputSchema },
     output: { schema: QuestionPaperOutputSchema },
@@ -73,27 +71,15 @@ const prompt = ai.definePrompt({
         The paper should include a title, general instructions, and multiple sections (e.g., Section A: MCQs, Section B: Short Answer). Each question must have assigned marks and a question type. For MCQs, provide options. Also provide the correct answer or key answer points for every question.`,
 });
 
-
-const generateQuestionPaperFlow = ai.defineFlow(
-  {
-    name: 'generateQuestionPaperFlow',
-    inputSchema: QuestionPaperInputSchema,
-    outputSchema: QuestionPaperOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Question Paper Generator flow.
  * @param {QuestionPaperInput} input - The specifications for the question paper.
  * @returns {Promise<QuestionPaperOutput>} The generated question paper.
  */
 export async function generateQuestionPaper(input: QuestionPaperInput): Promise<QuestionPaperOutput> {
-  return generateQuestionPaperFlow(input);
+  const {output} = await generateQuestionPaperPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

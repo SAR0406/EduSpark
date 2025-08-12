@@ -5,10 +5,8 @@
  * This flow creates a summary, practice questions, and MCQs for a given topic.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Chapter Material Generator flow.
@@ -39,7 +37,7 @@ const ChapterMaterialOutputSchema = z.object({
 });
 export type ChapterMaterialOutput = z.infer<typeof ChapterMaterialOutputSchema>;
 
-const prompt = ai.definePrompt({
+const chapterMaterialPrompt = ai.definePrompt({
     name: 'chapterMaterialPrompt',
     input: { schema: ChapterMaterialInputSchema },
     output: { schema: ChapterMaterialOutputSchema },
@@ -51,26 +49,15 @@ const prompt = ai.definePrompt({
         Provide a concise summary, 5-7 practice questions (short answer/descriptive), and 5 multiple-choice questions (MCQs) with options and the correct answer index.`,
 });
 
-const generateChapterMaterialFlow = ai.defineFlow(
-  {
-    name: 'generateChapterMaterialFlow',
-    inputSchema: ChapterMaterialInputSchema,
-    outputSchema: ChapterMaterialOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Chapter Material Generator flow.
  * @param {ChapterMaterialInput} input - The specifications for the chapter material.
  * @returns {Promise<ChapterMaterialOutput>} The generated learning materials.
  */
 export async function generateChapterMaterial(input: ChapterMaterialInput): Promise<ChapterMaterialOutput> {
-  return generateChapterMaterialFlow(input);
+  const {output} = await chapterMaterialPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

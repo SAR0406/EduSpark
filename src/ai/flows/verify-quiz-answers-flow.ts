@@ -6,10 +6,8 @@
  * correctness and provide explanations, acting as an independent verifier.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for a single question and its corresponding user answer.
@@ -45,7 +43,7 @@ export const VerifyQuizAnswersOutputSchema = z.object({
 });
 export type VerifyQuizAnswersOutput = z.infer<typeof VerifyQuizAnswersOutputSchema>;
 
-const prompt = ai.definePrompt({
+const verifyQuizAnswersPrompt = ai.definePrompt({
     name: 'verifyQuizAnswersPrompt',
     input: { schema: VerifyQuizAnswersInputSchema },
     output: { schema: VerifyQuizAnswersOutputSchema },
@@ -58,26 +56,15 @@ const prompt = ai.definePrompt({
         For each item, determine if the user's choice was correct, and provide the 'verifiedCorrectAnswerIndex' and a brief 'explanation' for the correct answer.`,
 });
 
-const verifyQuizAnswersFlow = ai.defineFlow(
-  {
-    name: 'verifyQuizAnswersFlow',
-    inputSchema: VerifyQuizAnswersInputSchema,
-    outputSchema: VerifyQuizAnswersOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Verify Quiz Answers flow.
  * @param {VerifyQuizAnswersInput} input - The user's questions and answers.
  * @returns {Promise<VerifyQuizAnswersOutput>} The AI-verified results and explanations.
  */
 export async function verifyQuizAnswers(input: VerifyQuizAnswersInput): Promise<VerifyQuizAnswersOutput> {
-  return verifyQuizAnswersFlow(input);
+  const {output} = await verifyQuizAnswersPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

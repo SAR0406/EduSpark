@@ -5,10 +5,8 @@
  * This flow creates a set of multiple-choice questions on a given topic.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for a single quiz question.
@@ -39,7 +37,7 @@ export const GenerateQuizOutputSchema = z.object({
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
-const prompt = ai.definePrompt({
+const generateQuizPrompt = ai.definePrompt({
     name: 'generateQuizPrompt',
     input: { schema: GenerateQuizInputSchema },
     output: { schema: GenerateQuizOutputSchema },
@@ -49,26 +47,15 @@ const prompt = ai.definePrompt({
         Each question should have 4 options, a correct answer index (0-3), and a brief explanation for the correct answer. Provide a title for the quiz.`,
 });
 
-const generateQuizFlow = ai.defineFlow(
-  {
-    name: 'generateQuizFlow',
-    inputSchema: GenerateQuizInputSchema,
-    outputSchema: GenerateQuizOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Quiz Generator flow.
  * @param {GenerateQuizInput} input - The topic, context, and number of questions.
  * @returns {Promise<GenerateQuizOutput>} The generated quiz.
  */
 export async function generateQuiz(input: GenerateQuizInput): Promise<GenerateQuizOutput> {
-  return generateQuizFlow(input);
+  const {output} = await generateQuizPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

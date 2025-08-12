@@ -5,10 +5,8 @@
  * This flow provides a step-by-step solution and final answer for a given problem.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Homework Helper flow.
@@ -28,7 +26,7 @@ export const HomeworkHelperOutputSchema = z.object({
 });
 export type HomeworkHelperOutput = z.infer<typeof HomeworkHelperOutputSchema>;
 
-const prompt = ai.definePrompt({
+const solveMathProblemPrompt = ai.definePrompt({
     name: 'solveMathProblemPrompt',
     input: { schema: HomeworkHelperInputSchema },
     output: { schema: HomeworkHelperOutputSchema },
@@ -38,26 +36,15 @@ const prompt = ai.definePrompt({
         State the final answer clearly.`,
 });
 
-const solveMathProblemFlow = ai.defineFlow(
-  {
-    name: 'solveMathProblemFlow',
-    inputSchema: HomeworkHelperInputSchema,
-    outputSchema: HomeworkHelperOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Homework Helper flow.
  * @param {HomeworkHelperInput} input - The problem statement.
  * @returns {Promise<HomeworkHelperOutput>} The solution, steps, and answer.
  */
 export async function solveMathProblem(input: HomeworkHelperInput): Promise<HomeworkHelperOutput> {
-  return solveMathProblemFlow(input);
+  const {output} = await solveMathProblemPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

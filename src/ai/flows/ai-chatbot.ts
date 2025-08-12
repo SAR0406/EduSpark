@@ -6,10 +6,8 @@
  * learning material provided as context.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the AI Chatbot flow.
@@ -30,7 +28,7 @@ const AskQuestionOutputSchema = z.object({
 export type AskQuestionOutput = z.infer<typeof AskQuestionOutputSchema>;
 
 
-const prompt = ai.definePrompt({
+const askQuestionPrompt = ai.definePrompt({
   name: 'askQuestionPrompt',
   input: {schema: AskQuestionInputSchema},
   output: {schema: AskQuestionOutputSchema},
@@ -51,26 +49,15 @@ const prompt = ai.definePrompt({
   User Question: {{{question}}}`,
 });
 
-const askQuestionFlow = ai.defineFlow(
-  {
-    name: 'askQuestionFlow',
-    inputSchema: AskQuestionInputSchema,
-    outputSchema: AskQuestionOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-      input: input,
-      model: model
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the AI Chatbot flow.
  * @param {AskQuestionInput} input - The student's question and context.
  * @returns {Promise<AskQuestionOutput>} The AI-generated answer.
  */
 export async function askQuestion(input: AskQuestionInput): Promise<AskQuestionOutput> {
-  return askQuestionFlow(input);
+  const {output} = await askQuestionPrompt.generate({
+    input: input,
+    model: model,
+  });
+  return output!;
 }

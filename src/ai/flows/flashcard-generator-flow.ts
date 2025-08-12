@@ -5,10 +5,8 @@
  * This flow creates a set of questions and answers for studying.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for a single flashcard.
@@ -36,7 +34,7 @@ export const GenerateFlashcardsOutputSchema = z.object({
 });
 export type GenerateFlashcardsOutput = z.infer<typeof GenerateFlashcardsOutputSchema>;
 
-const prompt = ai.definePrompt({
+const generateFlashcardsPrompt = ai.definePrompt({
     name: 'generateFlashcardsPrompt',
     input: { schema: GenerateFlashcardsInputSchema },
     output: { schema: GenerateFlashcardsOutputSchema },
@@ -47,26 +45,15 @@ const prompt = ai.definePrompt({
         ---`,
 });
 
-const generateFlashcardsFlow = ai.defineFlow(
-  {
-    name: 'generateFlashcardsFlow',
-    inputSchema: GenerateFlashcardsInputSchema,
-    outputSchema: GenerateFlashcardsOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Flashcard Generator flow.
  * @param {GenerateFlashcardsInput} input - The source text and number of cards.
  * @returns {Promise<GenerateFlashcardsOutput>} The generated flashcards and title.
  */
 export async function generateFlashcards(input: GenerateFlashcardsInput): Promise<GenerateFlashcardsOutput> {
-  return generateFlashcardsFlow(input);
+  const {output} = await generateFlashcardsPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

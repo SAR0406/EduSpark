@@ -5,10 +5,8 @@
  * This flow creates a tailored study schedule based on user performance and goals.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Personalized Study Plan flow.
@@ -29,7 +27,7 @@ export const PersonalizedStudyPlanOutputSchema = z.object({
 export type PersonalizedStudyPlanOutput = z.infer<typeof PersonalizedStudyPlanOutputSchema>;
 
 
-const prompt = ai.definePrompt({
+const generateStudyPlanPrompt = ai.definePrompt({
     name: 'generateStudyPlanPrompt',
     input: { schema: PersonalizedStudyPlanInputSchema },
     output: { schema: PersonalizedStudyPlanOutputSchema },
@@ -41,26 +39,15 @@ const prompt = ai.definePrompt({
         Provide the output as a well-formatted text string.`,
 });
 
-const generateStudyPlanFlow = ai.defineFlow(
-  {
-    name: 'generateStudyPlanFlow',
-    inputSchema: PersonalizedStudyPlanInputSchema,
-    outputSchema: PersonalizedStudyPlanOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Personalized Study Plan flow.
  * @param {PersonalizedStudyPlanInput} input - The user's performance, goals, and materials.
  * @returns {Promise<PersonalizedStudyPlanOutput>} The generated study plan.
  */
 export async function generateStudyPlan(input: PersonalizedStudyPlanInput): Promise<PersonalizedStudyPlanOutput> {
-  return generateStudyPlanFlow(input);
+  const {output} = await generateStudyPlanPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

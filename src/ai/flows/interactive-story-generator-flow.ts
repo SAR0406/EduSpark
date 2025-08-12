@@ -5,10 +5,8 @@
  * This flow creates a narrative based on user-provided characters, settings, and genres.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Interactive Story Generator flow.
@@ -30,7 +28,7 @@ export const GenerateStoryOutputSchema = z.object({
 });
 export type GenerateStoryOutput = z.infer<typeof GenerateStoryOutputSchema>;
 
-const prompt = ai.definePrompt({
+const generateStoryPrompt = ai.definePrompt({
     name: 'generateStoryPrompt',
     input: { schema: GenerateStoryInputSchema },
     output: { schema: GenerateStoryOutputSchema },
@@ -43,27 +41,15 @@ const prompt = ai.definePrompt({
         Also, provide a creative title for the story.`,
 });
 
-
-const generateStoryFlow = ai.defineFlow(
-  {
-    name: 'generateStoryFlow',
-    inputSchema: GenerateStoryInputSchema,
-    outputSchema: GenerateStoryOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Interactive Story Generator flow.
  * @param {GenerateStoryInput} input - The elements of the story.
  * @returns {Promise<GenerateStoryOutput>} The generated story title and text.
  */
 export async function generateInteractiveStory(input: GenerateStoryInput): Promise<GenerateStoryOutput> {
-  return generateStoryFlow(input);
+  const {output} = await generateStoryPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

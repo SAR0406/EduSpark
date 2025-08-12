@@ -5,10 +5,8 @@
  * This flow generates a list of engaging topics for a given subject area.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Debate Topic Suggester flow.
@@ -28,27 +26,12 @@ export const SuggestDebateTopicsOutputSchema = z.object({
 });
 export type SuggestDebateTopicsOutput = z.infer<typeof SuggestDebateTopicsOutputSchema>;
 
-const prompt = ai.definePrompt({
+const suggestDebateTopicsPrompt = ai.definePrompt({
     name: 'suggestDebateTopicsPrompt',
     input: { schema: SuggestDebateTopicsInputSchema },
     output: { schema: SuggestDebateTopicsOutputSchema },
     prompt: `Generate {{{numTopics}}} engaging and thought-provoking debate topics for the subject area: "{{{subjectArea}}}". Also suggest a creative title for this set of topics.`,
 });
-
-const suggestDebateTopicsFlow = ai.defineFlow(
-  {
-    name: 'suggestDebateTopicsFlow',
-    inputSchema: SuggestDebateTopicsInputSchema,
-    outputSchema: SuggestDebateTopicsOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
 
 /**
  * Executes the Debate Topic Suggester flow.
@@ -56,5 +39,9 @@ const suggestDebateTopicsFlow = ai.defineFlow(
  * @returns {Promise<SuggestDebateTopicsOutput>} The generated title and topics.
  */
 export async function suggestDebateTopics(input: SuggestDebateTopicsInput): Promise<SuggestDebateTopicsOutput> {
-  return suggestDebateTopicsFlow(input);
+  const {output} = await suggestDebateTopicsPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

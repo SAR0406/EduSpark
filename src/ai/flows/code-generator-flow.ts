@@ -6,10 +6,8 @@
  * the corresponding code and a step-by-step explanation.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Code Generator flow.
@@ -29,7 +27,7 @@ const GenerateCodeOutputSchema = z.object({
 });
 export type GenerateCodeOutput = z.infer<typeof GenerateCodeOutputSchema>;
 
-const prompt = ai.definePrompt({
+const generateCodePrompt = ai.definePrompt({
     name: 'generateCodePrompt',
     input: { schema: GenerateCodeInputSchema },
     output: { schema: GenerateCodeOutputSchema },
@@ -40,26 +38,15 @@ const prompt = ai.definePrompt({
         Provide the code as a single string, and a detailed, step-by-step explanation of how the code works.`,
 });
 
-const generateCodeFlow = ai.defineFlow(
-  {
-    name: 'generateCodeFlow',
-    inputSchema: GenerateCodeInputSchema,
-    outputSchema: GenerateCodeOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Code Generator flow.
  * @param {GenerateCodeInput} input - The language and problem description.
  * @returns {Promise<GenerateCodeOutput>} The generated code and explanation.
  */
 export async function generateCode(input: GenerateCodeInput): Promise<GenerateCodeOutput> {
-  return generateCodeFlow(input);
+  const {output} = await generateCodePrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

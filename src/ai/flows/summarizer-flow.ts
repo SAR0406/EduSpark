@@ -5,10 +5,8 @@
  * This flow condenses a given block of text into a summary of a specified length.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Summarizer flow.
@@ -28,7 +26,7 @@ export const SummarizeTextOutputSchema = z.object({
 });
 export type SummarizeTextOutput = z.infer<typeof SummarizeTextOutputSchema>;
 
-const prompt = ai.definePrompt({
+const summarizeTextPrompt = ai.definePrompt({
     name: 'summarizeTextPrompt',
     input: { schema: SummarizeTextInputSchema },
     output: { schema: SummarizeTextOutputSchema },
@@ -43,26 +41,15 @@ const prompt = ai.definePrompt({
         ---`,
 });
 
-const summarizeTextFlow = ai.defineFlow(
-  {
-    name: 'summarizeTextFlow',
-    inputSchema: SummarizeTextInputSchema,
-    outputSchema: SummarizeTextOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Summarizer flow.
  * @param {SummarizeTextInput} input - The text, optional chapter name, and desired length.
  * @returns {Promise<SummarizeTextOutput>} The generated summary.
  */
 export async function summarizeText(input: SummarizeTextInput): Promise<SummarizeTextOutput> {
-  return summarizeTextFlow(input);
+  const {output} = await summarizeTextPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

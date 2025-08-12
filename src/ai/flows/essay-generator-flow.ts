@@ -5,10 +5,8 @@
  * This flow crafts an essay based on a topic, length, and writing style.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Essay Generator flow.
@@ -29,7 +27,7 @@ export const GenerateEssayOutputSchema = z.object({
 });
 export type GenerateEssayOutput = z.infer<typeof GenerateEssayOutputSchema>;
 
-const prompt = ai.definePrompt({
+const generateEssayPrompt = ai.definePrompt({
     name: 'generateEssayPrompt',
     input: { schema: GenerateEssayInputSchema },
     output: { schema: GenerateEssayOutputSchema },
@@ -39,27 +37,15 @@ const prompt = ai.definePrompt({
         Also suggest a creative title for the essay.`,
 });
 
-
-const generateEssayFlow = ai.defineFlow(
-  {
-    name: 'generateEssayFlow',
-    inputSchema: GenerateEssayInputSchema,
-    outputSchema: GenerateEssayOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Essay Generator flow.
  * @param {GenerateEssayInput} input - The topic, length, and style specifications.
  * @returns {Promise<GenerateEssayOutput>} The generated essay and title suggestion.
  */
 export async function generateEssay(input: GenerateEssayInput): Promise<GenerateEssayOutput> {
-  return generateEssayFlow(input);
+  const {output} = await generateEssayPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

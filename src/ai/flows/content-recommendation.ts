@@ -5,10 +5,8 @@
  * This flow suggests new topics based on a user's learning history and preferences.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, model} from '@/ai/genkit';
 import {z} from 'zod';
-
-const model = 'googleai/gemini-2.0-flash-preview';
 
 /**
  * Zod schema for the input to the Content Recommendation flow.
@@ -27,7 +25,7 @@ export const RecommendContentOutputSchema = z.object({
 });
 export type RecommendContentOutput = z.infer<typeof RecommendContentOutputSchema>;
 
-const prompt = ai.definePrompt({
+const recommendContentPrompt = ai.definePrompt({
     name: 'recommendContentPrompt',
     input: { schema: RecommendContentInputSchema },
     output: { schema: RecommendContentOutputSchema },
@@ -38,27 +36,15 @@ const prompt = ai.definePrompt({
         Provide the recommendations as a simple, formatted text response.`,
 });
 
-
-const recommendContentFlow = ai.defineFlow(
-  {
-    name: 'recommendContentFlow',
-    inputSchema: RecommendContentInputSchema,
-    outputSchema: RecommendContentOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt.generate({
-        input: input,
-        model: model,
-    });
-    return output!;
-  }
-);
-
 /**
  * Executes the Content Recommendation flow.
  * @param {RecommendContentInput} input - The user's profile information.
  * @returns {Promise<RecommendContentOutput>} The AI-generated recommendations.
  */
 export async function recommendContent(input: RecommendContentInput): Promise<RecommendContentOutput> {
-  return recommendContentFlow(input);
+  const {output} = await recommendContentPrompt.generate({
+      input: input,
+      model: model,
+  });
+  return output!;
 }

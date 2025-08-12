@@ -19,3 +19,15 @@ export const ai = genkit({
   // Enable the Genkit developer UI for local development.
   enableDevUI: true,
 });
+
+/**
+ * The primary generative model used throughout the application.
+ * Centralized here for easy configuration and swapping.
+ */
+export const model = 'googleai/gemini-2.0-flash-preview';
+
+/**
+ * The primary image generation model used for visualization tasks.
+ */
+export const imageModel = 'googleai/gemini-2.0-flash-preview-image-generation';
+
