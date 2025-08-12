@@ -1,0 +1,17 @@
+# Firebase build/cache
+.firebase/
+functions/.next/
+functions/.output/
+functions/.cache/
+
+# Node dependencies
+node_modules/
+functions/node_modules/
+
+# Logs
+*.log
+
+# OS junk files
+.DS_Store
+Thumbs.db
+.next
