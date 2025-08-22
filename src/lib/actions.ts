@@ -146,9 +146,7 @@ export async function logStudyActivity(userId: string, activity: { title: string
     }
     try {
         const userActivitiesRef = collection(db, 'users', userId, 'studyActivities');
-        const docRef = doc(userActivitiesRef); // Create a new document reference with an auto-generated ID
         await addDoc(userActivitiesRef, {
-            id: docRef.id, // Store the auto-generated ID within the document
             ...activity,
             timestamp: serverTimestamp()
         });
