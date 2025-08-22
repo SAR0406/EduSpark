@@ -1,10 +1,20 @@
 
+"use client";
+
+import * as React from "react";
 import { LoginForm } from "@/components/auth/login-form";
 import { EduSparkLogo } from "@/components/icons/logo";
 import Link from "next/link";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
       <div className="flex items-center justify-center py-12">
@@ -18,7 +28,7 @@ export default function LoginPage() {
               Enter your credentials to access your dashboard.
             </p>
           </div>
-          <LoginForm />
+          {isClient ? <LoginForm /> : <div className="h-[280px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/register" className="underline font-semibold text-primary">

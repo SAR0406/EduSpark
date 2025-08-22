@@ -1,10 +1,20 @@
 
+"use client";
+
+import * as React from "react";
 import { RegisterForm } from "@/components/auth/register-form";
 import { EduSparkLogo } from "@/components/icons/logo";
 import Link from "next/link";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
        <div className="flex items-center justify-center py-12">
@@ -18,7 +28,7 @@ export default function RegisterPage() {
               Join EduSpark and start your personalized learning journey today.
             </p>
           </div>
-          <RegisterForm />
+          {isClient ? <RegisterForm /> : <div className="h-[340px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/login" className="underline font-semibold text-primary">
