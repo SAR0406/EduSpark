@@ -27,6 +27,7 @@ import {
   VenetianMask,
   Users as UsersIcon,
   Video,
+  BookCopy,
 } from "lucide-react";
 import {
     SidebarProvider,
@@ -61,7 +62,7 @@ const navItems = {
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/chatbot", icon: MessageCircleQuestion, label: "AI Tutor" },
     { href: "/quizzes", icon: VenetianMask, label: "AI Quiz Generator" },
-    { href: "/content", icon: BookOpen, label: "Chapter Materials" },
+    { href: "/content", icon: BookCopy, label: "Chapter Materials" },
     { href: "/progress", icon: BarChart3, label: "My Progress" },
     { href: "/achievements", icon: Trophy, label: "Achievements" },
     { href: "/live-class", icon: Video, label: "Live Class" },
@@ -158,7 +159,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         }
     };
     
-    const currentNavItems = navItems[userRole || 'default'] || navItems.default;
+    const currentNavItems = navItems[userRole || 'student'] || navItems.default;
     const allNavItems = [...currentNavItems, ...aiTools];
 
     return (
@@ -228,7 +229,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset>
+        <div className="flex-1 flex flex-col h-full">
              <header className="flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:px-6 sticky top-0 z-30">
                 <SidebarTrigger/>
                 <div className="w-full flex-1">
@@ -278,7 +279,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                 </CommandGroup>
                 </CommandList>
             </CommandDialog>
-        </SidebarInset>
+        </div>
       </div>
     );
 }

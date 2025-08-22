@@ -39,6 +39,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
             );
         }
+    }
+    
+    // For unauthenticated routes like /login or /register, we don't need the main app layout.
+    if (!isAuthenticated) {
         return <>{children}</>;
     }
     
