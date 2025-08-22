@@ -48,8 +48,9 @@ export function AnimatedBackground() {
       canvas.height = window.innerHeight;
     };
     
-    window.addEventListener('resize', resizeCanvas);
+    // Run resize once on mount
     resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
     
     const render = () => {
       frameCount++;
@@ -57,13 +58,15 @@ export function AnimatedBackground() {
       animationFrameId = window.requestAnimationFrame(render);
     };
     
+    // Start animation
     render();
 
+    // Cleanup function
     return () => {
       window.cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [draw]);
+  }, [draw]); // draw is memoized with useCallback
 
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10" />;
 }

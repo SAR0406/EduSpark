@@ -18,21 +18,8 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
     throw new Error("CRITICAL ERROR: Firebase API Key or Project ID is missing from environment variables. Ensure NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_PROJECT_ID are set in your .env.local file and the Next.js server was restarted.");
 }
 
-
 // Initialize Firebase
-let app;
-if (!getApps().length) {
-  try {
-    app = initializeApp(firebaseConfig);
-  } catch (e) {
-    console.error("Firebase initialization failed:", e);
-    // In a real app, you might want to show a more user-friendly error
-    // or disable Firebase-dependent features.
-    throw new Error("Could not initialize Firebase. Please check your configuration in the Firebase console.");
-  }
-} else {
-  app = getApp();
-}
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 const auth = getAuth(app);
 const db = getFirestore(app);
