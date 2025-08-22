@@ -13,8 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Layers, Wand2, Loader2, Lightbulb, BookCopy, FlipHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleGenerateFlashcards } from "@/lib/actions";
-import type { GenerateFlashcardsOutput } from "@/ai/flows/flashcard-generator-flow";
+import { generateFlashcards, type GenerateFlashcardsOutput } from "@/ai/flows/flashcard-generator-flow";
 import { Badge } from "@/components/ui/badge";
 import { awardAchievement } from "@/lib/achievements";
 
@@ -48,25 +47,28 @@ export default function FlashcardGeneratorPage() {
     setGeneratedResult(null);
     setFlashcardStates([]);
 
-    const result = await handleGenerateFlashcards({
-      sourceText: values.sourceText,
-      numFlashcards: values.numFlashcards,
-    });
-
-    if (result.success && result.data && result.data.flashcards.length > 0) {
-      setGeneratedResult(result.data);
-      setFlashcardStates(result.data.flashcards.map(() => ({ isFlipped: false })));
-      toast({
-        title: "Flashcards Generated! 🧠✨",
-        description: result.data.suggestedTitle ? `Set Title: ${result.data.suggestedTitle}` : "Your flashcards are ready to study!",
-      });
-      awardAchievement('flashcardFanatic', toast);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Generating Flashcards 😟",
-        description: result.error || "Failed to create flashcards. Please check your input or try again.",
-      });
+    try {
+        const data = await generateFlashcards({
+          sourceText: values.sourceText,
+          numFlashcards: values.numFlashcards,
+        });
+        if (data && data.flashcards.length > 0) {
+            setGeneratedResult(data);
+            setFlashcardStates(data.flashcards.map(() => ({ isFlipped: false })));
+            toast({
+                title: "Flashcards Generated! 🧠✨",
+                description: data.suggestedTitle ? `Set Title: ${data.suggestedTitle}` : "Your flashcards are ready to study!",
+            });
+            awardAchievement('flashcardFanatic', toast);
+        } else {
+            throw new Error("AI failed to generate flashcards from the provided text.");
+        }
+    } catch(error) {
+        toast({
+            variant: "destructive",
+            title: "Error Generating Flashcards 😟",
+            description: error instanceof Error ? error.message : "Failed to create flashcards. Please check your input or try again.",
+        });
     }
     setIsLoading(false);
   }
@@ -82,9 +84,11 @@ export default function FlashcardGeneratorPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-        <Layers className="h-10 w-10 text-primary text-glow" />
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <Layers className="h-7 w-7" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Flashcard Generator</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Flashcard Generator</h1>
           <p className="text-md text-muted-foreground mt-1">
             Paste your notes, and let AI create interactive flashcards for effective learning.
           </p>

@@ -13,8 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { MessageSquare, Wand2, Loader2, ThumbsUp, Lightbulb, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleSuggestDebateTopics } from "@/lib/actions";
-import type { SuggestDebateTopicsOutput } from "@/ai/flows/debate-topic-suggester-flow";
+import { suggestDebateTopics, type SuggestDebateTopicsOutput } from "@/ai/flows/debate-topic-suggester-flow";
 import { Badge } from "@/components/ui/badge";
 
 const debateTopicSuggesterSchema = z.object({
@@ -41,38 +40,37 @@ export default function DebateTopicSuggesterPage() {
     setIsLoading(true);
     setGeneratedResult(null);
 
-    const result = await handleSuggestDebateTopics({
-      subjectArea: values.subjectArea,
-      numTopics: values.numTopics,
-    });
-
-    if (result.success && result.data) {
-      setGeneratedResult(result.data);
-      toast({
-        title: "Debate Topics Suggested! 🤔💡",
-        description: result.data.suggestedTitle || "Your debate topics are ready below.",
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Suggesting Topics 😟",
-        description: result.error || "Failed to get topics from the AI. Please try again.",
-      });
+    try {
+        const data = await suggestDebateTopics({
+            subjectArea: values.subjectArea,
+            numTopics: values.numTopics,
+        });
+        setGeneratedResult(data);
+        toast({
+            title: "Debate Topics Suggested! 🤔💡",
+            description: data.suggestedTitle || "Your debate topics are ready below.",
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Suggesting Topics 😟",
+            description: error instanceof Error ? error.message : "Failed to get topics from the AI. Please try again.",
+        });
     }
     setIsLoading(false);
   }
 
   return (
     <div className="space-y-8">
-      <div className="glass-card p-6 rounded-2xl shadow-lg border border-primary/20">
-        <div className="flex items-center gap-4">
-          <Brain className="h-10 w-10 text-primary text-glow" />
-          <div>
-            <CardTitle className="text-3xl font-bold text-glow font-heading">AI Debate Topic Suggester</CardTitle>
-            <CardDescription className="text-md text-muted-foreground mt-1">
-              Spark critical thinking! Enter a subject, and our AI will generate engaging debate topics.
-            </CardDescription>
-          </div>
+      <div className="flex items-center gap-4 p-2">
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <Brain className="h-7 w-7" />
+        </div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Debate Topic Suggester</h1>
+          <p className="text-md text-muted-foreground mt-1">
+            Spark critical thinking! Enter a subject, and our AI will generate engaging debate topics.
+          </p>
         </div>
       </div>
 

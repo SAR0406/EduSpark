@@ -14,8 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlignLeft, Wand2, Loader2, FileText, BookText, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleSummarizeText } from "@/lib/actions";
-import type { SummarizeTextOutput } from "@/ai/flows/summarizer-flow";
+import { summarizeText, type SummarizeTextOutput } from "@/ai/flows/summarizer-flow";
 import { awardAchievement } from "@/lib/achievements";
 
 const summarizerSchema = z.object({
@@ -45,29 +44,28 @@ export default function SummarizerPage() {
     setIsLoading(true);
     setGeneratedSummary(null);
 
-    const result = await handleSummarizeText({
-      textToSummarize: values.textToSummarize,
-      summaryLength: values.summaryLength,
-      chapterName: values.chapterName,
-    });
-
-    if (result.success && result.data) {
-      setGeneratedSummary(result.data);
-      toast({
-        title: "Summary Generated! ✍️",
-        description: "The AI has created a summary for your text below.",
-      });
-      const newCount = summarizerCount + 1;
-      setSummarizerCount(newCount);
-      if (newCount >= 1) { 
-        awardAchievement('masterSummarizer', toast);
-      }
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Generating Summary 😟",
-        description: result.error || "Failed to get summary from the AI. Please try again.",
-      });
+    try {
+        const data = await summarizeText({
+            textToSummarize: values.textToSummarize,
+            summaryLength: values.summaryLength,
+            chapterName: values.chapterName,
+        });
+        setGeneratedSummary(data);
+        toast({
+            title: "Summary Generated! ✍️",
+            description: "The AI has created a summary for your text below.",
+        });
+        const newCount = summarizerCount + 1;
+        setSummarizerCount(newCount);
+        if (newCount >= 1) { 
+            awardAchievement('masterSummarizer', toast);
+        }
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Generating Summary 😟",
+            description: error instanceof Error ? error.message : "Failed to get summary from the AI. Please try again.",
+        });
     }
     setIsLoading(false);
   }
@@ -75,9 +73,11 @@ export default function SummarizerPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-        <AlignLeft className="h-10 w-10 text-primary text-glow" />
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <AlignLeft className="h-7 w-7" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Text Summarizer</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Text Summarizer</h1>
           <p className="text-md text-muted-foreground mt-1">
             Paste your long text, notes, or articles and let our AI craft a concise summary.
           </p>

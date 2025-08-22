@@ -13,9 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Code2, Wand2, Lightbulb, Terminal, Loader2, Brain, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleGenerateCode } from "@/lib/actions";
-import type { GenerateCodeOutput } from "@/lib/actions";
-import { Separator } from "@/components/ui/separator";
+import { generateCode, type GenerateCodeOutput } from "@/ai/flows/code-generator-flow";
 import { awardAchievement } from "@/lib/achievements";
 
 const programmingLanguages = ["Python", "JavaScript", "Java", "C++", "TypeScript", "Go", "Ruby", "PHP", "Swift", "Kotlin", "SQL", "HTML", "CSS", "Shell"];
@@ -44,23 +42,22 @@ export default function CodeGeneratorPage() {
     setIsLoading(true);
     setGeneratedResult(null);
 
-    const result = await handleGenerateCode({
-      language: values.language,
-      problemDescription: values.problemDescription,
-    });
-
-    if (result.success && result.data) {
-      setGeneratedResult(result.data);
+    try {
+      const data = await generateCode({
+        language: values.language,
+        problemDescription: values.problemDescription,
+      });
+      setGeneratedResult(data);
       toast({
         title: "Code Generated! 🤖✨",
         description: "The AI has generated your code and an explanation.",
       });
       awardAchievement('codeApprentice', toast);
-    } else {
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Error Generating Code 😟",
-        description: result.error || "Failed to get code from the AI. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to get code from the AI. Please try again.",
       });
     }
 
@@ -78,9 +75,11 @@ export default function CodeGeneratorPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-        <Terminal className="h-10 w-10 text-primary text-glow" />
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <Terminal className="h-7 w-7" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Code Generator & Explainer</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Code Generator & Explainer</h1>
           <p className="text-md text-muted-foreground mt-1">
             Select a language, describe a problem, and let AI generate the code and explain it.
           </p>

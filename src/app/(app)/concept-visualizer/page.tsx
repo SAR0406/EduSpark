@@ -12,8 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Share2, Wand2, Loader2, Image as ImageIcon, Lightbulb, AlertCircle } from "lucide-react"; 
 import { useToast } from "@/hooks/use-toast";
-import { handleVisualizeConcept } from "@/lib/actions";
-import type { VisualizeConceptOutput } from "@/ai/flows/concept-visualizer-flow";
+import { visualizeConcept, type VisualizeConceptOutput } from "@/ai/flows/concept-visualizer-flow";
 import NextImage from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { awardAchievement } from "@/lib/achievements";
@@ -41,26 +40,30 @@ export default function ConceptVisualizerPage() {
     setIsLoading(true);
     setGeneratedVisual(null);
 
-    const result = await handleVisualizeConcept({
-      conceptDescription: values.conceptDescription,
-    });
+    try {
+        const data = await visualizeConcept({
+          conceptDescription: values.conceptDescription,
+        });
 
-    if (result.success && result.data && result.data.imageDataUri) {
-      setGeneratedVisual(result.data);
-      toast({
-        title: "Concept Illustrated! 🖼️✨",
-        description: result.data.textFeedback || "The AI has generated a visual for your concept.",
-      });
-      const newCount = conceptCount + 1;
-      setConceptCount(newCount);
-      if (newCount >= 1) { 
-        awardAchievement('conceptConnoisseur', toast);
-      }
-    } else {
-      toast({
+        if (data && data.imageDataUri) {
+          setGeneratedVisual(data);
+          toast({
+            title: "Concept Illustrated! 🖼️✨",
+            description: data.textFeedback || "The AI has generated a visual for your concept.",
+          });
+          const newCount = conceptCount + 1;
+          setConceptCount(newCount);
+          if (newCount >= 1) { 
+            awardAchievement('conceptConnoisseur', toast);
+          }
+        } else {
+            throw new Error("AI did not return a valid image.");
+        }
+    } catch (error) {
+       toast({
         variant: "destructive",
         title: "Error Illustrating Concept 😟",
-        description: result.error || "Failed to get visual from the AI. Please ensure your concept is clear or try again.",
+        description: error instanceof Error ? error.message : "Failed to get visual from the AI. Please ensure your concept is clear or try again.",
       });
     }
     setIsLoading(false);
@@ -69,9 +72,11 @@ export default function ConceptVisualizerPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-          <Share2 className="h-10 w-10 text-primary text-glow" />
+          <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <Share2 className="h-7 w-7" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Diagram & Concept Illustrator</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Diagram & Concept Illustrator</h1>
             <p className="text-md text-muted-foreground mt-1">
               Enter a concept, and our AI will generate a 2D visual (diagram, flowchart, or illustration).
             </p>

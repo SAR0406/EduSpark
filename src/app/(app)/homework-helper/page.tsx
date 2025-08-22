@@ -12,8 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Calculator, Brain, Loader2, CheckCircle, Wand2, Lightbulb, BookOpen, Edit2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleSolveMathProblem } from "@/lib/actions";
-import type { HomeworkHelperOutput } from "@/ai/flows/homework-helper-flow";
+import { solveMathProblem, type HomeworkHelperOutput } from "@/ai/flows/homework-helper-flow";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { awardAchievement } from "@/lib/achievements";
@@ -40,23 +39,22 @@ export default function HomeworkHelperPage() {
     setIsLoading(true);
     setSolution(null);
 
-    const result = await handleSolveMathProblem({
-      problemStatement: values.problemStatement,
-    });
-
-    if (result.success && result.data) {
-      setSolution(result.data);
-      toast({
-        title: "Problem Solved! 🧠✨",
-        description: "The AI has provided a solution and explanation below.",
-      });
-      awardAchievement('mathSolver', toast);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Solving Problem 😟",
-        description: result.error || "The AI couldn't solve this problem. Please check your input or try rephrasing.",
-      });
+    try {
+        const data = await solveMathProblem({
+            problemStatement: values.problemStatement,
+        });
+        setSolution(data);
+        toast({
+            title: "Problem Solved! 🧠✨",
+            description: "The AI has provided a solution and explanation below.",
+        });
+        awardAchievement('mathSolver', toast);
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Solving Problem 😟",
+            description: error instanceof Error ? error.message : "The AI couldn't solve this problem. Please check your input or try rephrasing.",
+        });
     }
     setIsLoading(false);
   }
@@ -64,9 +62,11 @@ export default function HomeworkHelperPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-        <Calculator className="h-10 w-10 text-primary text-glow" />
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <Calculator className="h-7 w-7" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Homework Helper</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Homework Helper</h1>
           <p className="text-md text-muted-foreground mt-1">
             Stuck on a math problem? Enter it below for a step-by-step solution.
           </p>

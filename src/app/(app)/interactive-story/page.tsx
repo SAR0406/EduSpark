@@ -13,8 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wand2, Loader2, BookOpen, Feather, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleGenerateInteractiveStory } from "@/lib/actions";
-import type { GenerateStoryOutput } from "@/ai/flows/interactive-story-generator-flow";
+import { generateInteractiveStory, type GenerateStoryOutput } from "@/ai/flows/interactive-story-generator-flow";
 import { Badge } from "@/components/ui/badge";
 import { awardAchievement } from "@/lib/achievements";
 
@@ -46,26 +45,25 @@ export default function InteractiveStoryPage() {
     setIsLoading(true);
     setGeneratedStory(null);
 
-    const result = await handleGenerateInteractiveStory({
-      mainCharacter: values.mainCharacter,
-      setting: values.setting,
-      genre: values.genre,
-      storyLength: values.storyLength,
-    });
-
-    if (result.success && result.data) {
-      setGeneratedStory(result.data);
-      toast({
-        title: "Story Generated! 📖✨",
-        description: `"${result.data.title}" is ready for you to read.`,
-      });
-      awardAchievement('buddingAuthor', toast);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Generating Story 😟",
-        description: result.error || "Failed to get story from the AI. Please try again.",
-      });
+    try {
+        const data = await generateInteractiveStory({
+            mainCharacter: values.mainCharacter,
+            setting: values.setting,
+            genre: values.genre,
+            storyLength: values.storyLength,
+        });
+        setGeneratedStory(data);
+        toast({
+            title: "Story Generated! 📖✨",
+            description: `"${data.title}" is ready for you to read.`,
+        });
+        awardAchievement('buddingAuthor', toast);
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Generating Story 😟",
+            description: error instanceof Error ? error.message : "Failed to get story from the AI. Please try again.",
+        });
     }
     setIsLoading(false);
   }
@@ -73,9 +71,11 @@ export default function InteractiveStoryPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-        <Feather className="h-10 w-10 text-primary text-glow" />
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <Feather className="h-7 w-7" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Interactive Story Weaver</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Interactive Story Weaver</h1>
           <p className="text-md text-muted-foreground mt-1">
             Craft your own unique narrative! Provide a character, setting, and genre to bring your story to life.
           </p>

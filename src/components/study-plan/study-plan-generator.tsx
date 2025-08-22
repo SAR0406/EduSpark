@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { handleGenerateStudyPlan } from "@/lib/actions";
+import { generateStudyPlan } from "@/ai/flows/personalized-study-plans";
 import { Loader2, ListChecks, Sparkles, Target, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { awardAchievement } from "@/lib/achievements";
@@ -40,21 +40,20 @@ export function StudyPlanGenerator() {
     setIsLoading(true);
     setGeneratedPlan(null);
 
-    const result = await handleGenerateStudyPlan(values);
-
-    if (result.success && result.data) {
-      setGeneratedPlan(result.data.studyPlan);
-      toast({
-        title: "Study Plan Generated! 🚀",
-        description: "Your personalized study plan is ready below.",
-      });
-      awardAchievement('plannerPro', toast);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Generating Study Plan 😟",
-        description: result.error || "Failed to generate study plan. Please try again.",
-      });
+    try {
+        const data = await generateStudyPlan(values);
+        setGeneratedPlan(data.studyPlan);
+        toast({
+            title: "Study Plan Generated! 🚀",
+            description: "Your personalized study plan is ready below.",
+        });
+        awardAchievement('plannerPro', toast);
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Generating Study Plan 😟",
+            description: error instanceof Error ? error.message : "Failed to generate study plan. Please try again.",
+        });
     }
     setIsLoading(false);
   }

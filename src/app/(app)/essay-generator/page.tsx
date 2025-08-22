@@ -13,8 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileSignature, Wand2, Loader2, Brain, Lightbulb, Type } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { handleGenerateEssay } from "@/lib/actions";
-import type { GenerateEssayOutput } from "@/ai/flows/essay-generator-flow";
+import { generateEssay, type GenerateEssayOutput } from "@/ai/flows/essay-generator-flow";
 import { Badge } from "@/components/ui/badge";
 
 const essayGeneratorSchema = z.object({
@@ -43,24 +42,23 @@ export default function EssayGeneratorPage() {
     setIsLoading(true);
     setGeneratedResult(null);
 
-    const result = await handleGenerateEssay({
-      topic: values.topic,
-      essayLength: values.essayLength,
-      style: values.style,
-    });
-
-    if (result.success && result.data) {
-      setGeneratedResult(result.data);
-      toast({
-        title: "Essay Generated! ✒️✨",
-        description: result.data.titleSuggestion ? `Suggested Title: ${result.data.titleSuggestion}` : "Your essay is ready below.",
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Generating Essay 😟",
-        description: result.error || "Failed to get essay from the AI. Please try again.",
-      });
+    try {
+        const data = await generateEssay({
+            topic: values.topic,
+            essayLength: values.essayLength,
+            style: values.style,
+        });
+        setGeneratedResult(data);
+        toast({
+            title: "Essay Generated! ✒️✨",
+            description: data.titleSuggestion ? `Suggested Title: ${data.titleSuggestion}` : "Your essay is ready below.",
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Generating Essay 😟",
+            description: error instanceof Error ? error.message : "Failed to get essay from the AI. Please try again.",
+        });
     }
     setIsLoading(false);
   }
@@ -68,9 +66,11 @@ export default function EssayGeneratorPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4 p-2">
-        <FileSignature className="h-10 w-10 text-primary text-glow" />
+        <div className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            <FileSignature className="h-7 w-7" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold font-heading text-gradient-primary">AI Essay Generator</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-glow">AI Essay Generator</h1>
           <p className="text-md text-muted-foreground mt-1">
             Provide a topic, select length and style, and let our AI craft an essay for you.
           </p>

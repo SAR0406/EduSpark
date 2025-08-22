@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { handleRecommendContent } from "@/lib/actions";
+import { recommendContent } from "@/ai/flows/content-recommendation";
 import { Loader2, Search, Sparkles, ThumbsUp, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,20 +37,19 @@ export function RecommendationEngine() {
     setIsLoading(true);
     setRecommendations(null);
 
-    const result = await handleRecommendContent(values);
-
-    if (result.success && result.data) {
-      setRecommendations(result.data.recommendedMaterials);
-      toast({
-        title: "Recommendations Ready! ✨",
-        description: "We've found some learning materials tailored for you.",
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error Getting Recommendations 😟",
-        description: result.error || "Failed to get recommendations. Please try again.",
-      });
+    try {
+        const data = await recommendContent(values);
+        setRecommendations(data.recommendedMaterials);
+        toast({
+            title: "Recommendations Ready! ✨",
+            description: "We've found some learning materials tailored for you.",
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error Getting Recommendations 😟",
+            description: error instanceof Error ? error.message : "Failed to get recommendations. Please try again.",
+        });
     }
     setIsLoading(false);
   }
