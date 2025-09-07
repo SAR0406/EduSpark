@@ -54,6 +54,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 type UserRole = 'student' | 'teacher' | 'parent' | 'admin' | null;
 
@@ -247,6 +248,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                     <Search className="h-5 w-5" />
                     <span className="sr-only">Search</span>
                 </Button>
+                <ThemeToggle />
                 <Button variant="ghost" size="icon" className="rounded-full">
                     <Bell className="h-5 w-5" />
                     <span className="sr-only">Toggle notifications</span>

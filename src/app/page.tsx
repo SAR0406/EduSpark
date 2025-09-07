@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { BrainCircuit, Zap, BarChart3, ShieldCheck, Award, MessageCircle, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EduSparkLogo } from '@/components/icons/logo';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -60,11 +61,12 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background/80 backdrop-blur-sm">
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/50">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container-pro flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <EduSparkLogo className="h-6 w-auto text-glow" />
           </Link>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="ghost" asChild>
               <Link href="/login">Log In</Link>
             </Button>
@@ -86,7 +88,7 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/50"></div>
           <motion.div
-            className="container text-center relative z-10"
+            className="container-pro text-center relative z-10"
             initial="hidden"
             animate="visible"
             variants={containerVariants}
@@ -125,7 +127,7 @@ export default function HomePage() {
         </section>
 
         <section id="features" className="py-24 sm:py-32">
-          <div className="container">
+          <div className="container-pro">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 A Smarter Way to Learn
@@ -144,7 +146,7 @@ export default function HomePage() {
               {features.map((feature) => (
                 <motion.div 
                     key={feature.title}
-                    className="glass-card rounded-2xl p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-primary/10"
+                    className="glass-card glass-hover rounded-2xl p-6"
                     variants={itemVariants}
                 >
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
