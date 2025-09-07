@@ -8,6 +8,8 @@ import { motion } from 'framer-motion';
 import { EduSparkLogo } from '@/components/icons/logo';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import Image from 'next/image';
+import { TrustBar } from '@/components/marketing/trust-bar';
+import { SiteFooter } from '@/components/layout/site-footer';
 
 export default function HomePage() {
   const features = [
@@ -125,6 +127,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
         </section>
+        <TrustBar />
 
         <section id="features" className="py-24 sm:py-32">
           <div className="container-pro">
@@ -161,11 +164,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-white/10">
-        <div className="container py-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} EduSpark. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
