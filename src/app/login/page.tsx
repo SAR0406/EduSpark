@@ -16,9 +16,9 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[380px] gap-6">
+    <div className="w-full min-h-screen lg:grid lg:grid-cols-2 bg-gradient-to-b from-background via-background/90 to-background/80">
+      <div className="flex items-center justify-center py-12 px-4">
+        <div className="mx-auto grid w-[380px] gap-6 glass-card glass-hover rounded-2xl p-6">
           <div className="grid gap-2">
              <Link href="/" className="flex items-center gap-2 font-semibold mb-4">
                 <EduSparkLogo className="h-7 w-auto text-glow" />
@@ -37,15 +37,15 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block relative">
+      <div className="hidden lg:block relative">
         <Image
           src="https://i.ibb.co/xKCHSHD2/20250521-0854-Edu-Spark-Educational-Banner-simple-compose-01jvrdts8qefg8yjqxfhkarkd5.png"
           alt="EduSpark innovative learning banner"
           layout="fill"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover opacity-60"
           priority
         />
-         <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/20 to-transparent"></div>
+         <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent"></div>
       </div>
     </div>
   );
